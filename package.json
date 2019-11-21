@@ -1,0 +1,82 @@
+{
+  "name": "@imbueapp/mockingbird-artillery",
+  "version": "0.0.1",
+  "description": "Mocktillery",
+  "bin": {
+    "mocktillery": "./bin/mocktillery"
+  },
+  "scripts": {
+    "postinstall": "npx tsc",
+    "prepublishOnly": "npx tsc",
+    "dev": "tsc-watch --onSuccess \"node ./bin/mocktillery\"",
+    "mocktillery:run": "npx tsc && NODE_ENV=production npm run print:project && node ./dist/index.js",
+    "test": "npx tsc && NODE_ENV=test LOG_LEVEL=off jest test/*.test.js",
+    "print:project": "asciify ' mocktillery ' -f puffy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com:sasasavic82/mocktillery.git"
+  },
+  "types": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "dependencies": {
+    "@types/dotenv": "^6.1.1",
+    "@types/jsonata": "1.5.1",
+    "@types/node": "^12.11.7",
+    "@types/supertest": "^2.0.8",
+    "@types/uuid": "3.4.3",
+    "@types/js-yaml": "3.11.1",
+    "@types/util.promisify": "^1.0.1",
+    "chalk": "^2.4.2",
+    "dotenv": "^8.2.0",
+    "express": "^5.0.0-alpha.7",
+    "jsonata": "^1.7.0",
+    "tsc-watch": "^4.0.0",
+    "typescript": "^3.6.4",
+    "uuid": "^3.3.3",
+    "js-yaml": "^3.13.1",
+    "util": "^0.12.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.19",
+    "asciify": "^1.3.5",
+    "tslint": "^5.20.0",
+    "tslint-jest": "1.0.5",
+    "ts-jest": "^24.1.0",
+    "tslint-config-prettier": "1.18.0",
+    "jest": "^24.9.0",
+    "lint-staged": "^9.4.1",
+    "prettier": "^1.18.2"
+  },
+  "lint-staged": {
+    "*.js": [
+      "tslint --format codeframe --fix",
+      "git add"
+    ],
+    "*.{json,yaml,yml,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "jest": {
+    "verbose": true,
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  },
+  "keywords": [
+    "mocking",
+    "artillery"
+  ],
+  "author": "Sasa Savic, <sasa@imbue.app>",
+  "license": "MIT"
+}

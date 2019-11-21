@@ -1,0 +1,4 @@
+apps:
+  - script: ./bin/mocktillery
+    instances: max
+    exec_mode: cluster
