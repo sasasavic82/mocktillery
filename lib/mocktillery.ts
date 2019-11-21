@@ -47,9 +47,9 @@ export class Mocktillery {
      */
     public async run(url: string, withReport: Boolean = false): Promise<void> {
         try {
-            await this.runInternal(url);
+            await this.runTestsInternal(url);
             if(withReport) 
-                await this.runInternalReport();
+                await this.runReportInternal();
 
         } catch(e) {
             console.log(e);
@@ -57,10 +57,10 @@ export class Mocktillery {
     }
 
     /**
-     * 
+     * Internal function that kicks off load/functional tests
      * @param url 
      */
-    private async runInternal(url: string): Promise<void> {
+    private async runTestsInternal(url: string): Promise<void> {
 
         try {
             let ret: Std = await execAsync(`artillery run --target ${url} config.yml --output ${this.config.outputFilename}.json --quiet &> ${this.config.outputFilename}.log`);
@@ -72,7 +72,12 @@ export class Mocktillery {
         }        
     }
 
-    private async runInternalReport(): Promise<void> {
+    /**
+     * Internal function that runs once test run completes.
+     * The function runs an external process (artillery) that amalgamates the load / functional test results
+     * and outputs a html file.
+     */
+    private async runReportInternal(): Promise<void> {
         
         try {
             let ret: Std = await execAsync(`artillery report ${this.config.outputFilename}.json`, {
@@ -86,6 +91,12 @@ export class Mocktillery {
         }        
     }
 
+    /**
+     * Load functional tests from the functional tests folder
+     * 
+     * This method will load the configuration file, as well as the individual
+     * test scenarios/cases.
+     */
     private loadFunctionalTests(): void {
 
         let testDir: string = this.getTestFolderPath();
@@ -101,6 +112,9 @@ export class Mocktillery {
 
     }
 
+    /**
+     * Function that loads, parses and outputs the test scenarios/cases.
+     */
     private loadScenarios(): any[] {
 
         let scenarioFiles: string[] = fs.readdirSync(this.getTestFolderPath("scenarios"));
@@ -121,6 +135,11 @@ export class Mocktillery {
         });
     }
 
+    /**
+     * Load the config section of the tests. This section specifies attributes
+     * related to the length of the tests and the different load phases
+     * that would run.
+     */
     private loadConfig(): ConfigObject {
 
         let config: ConfigObject | undefined = this.loadYmlObject("config.yml");
@@ -131,6 +150,10 @@ export class Mocktillery {
         return config.config;     
     }
 
+    /**
+     * Helper method for loading yml files.
+     * @param file yml filename
+     */
     private loadYmlObject(file: string): ConfigObject | undefined {
 
         let configPath = path.join(this.getTestFolderPath(), file);
@@ -151,6 +174,10 @@ export class Mocktillery {
 
     }
 
+    /**
+     * Helper method for constructing the full test path, including subfolders
+     * @param folderPath sub folders
+     */
     private getTestFolderPath(folderPath: string = ""): string {
         return path.join(this.currentWorkingDir, this.config.testFolder, folderPath);
     }
