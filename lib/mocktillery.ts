@@ -36,7 +36,7 @@ export class Mocktillery {
         let yamlString = yml.safeDump(this.configObject);
 
         fs.writeFileSync(
-            path.join(this.currentWorkingDir, this.config.compileFolder, "config.yml"), yamlString
+            path.join(this.currentWorkingDir, this.config.compileFolder, "testplan.yml"), yamlString
         );
     }
 
@@ -63,7 +63,7 @@ export class Mocktillery {
     private async runTestsInternal(url: string): Promise<void> {
 
         try {
-            let ret: Std = await execAsync(`artillery run --target ${url} config.yml --output ${this.config.outputFilename}.json --quiet &> ${this.config.outputFilename}.log`);
+            let ret: Std = await execAsync(`artillery run --target ${url} testplan.yml --output ${this.config.outputFilename}.json --quiet &> ${this.config.outputFilename}.log`);
             console.log(ret.stdout);
             console.log(ret.stderr);
 
