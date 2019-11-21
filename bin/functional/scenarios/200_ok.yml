@@ -1,0 +1,11 @@
+scenarios:
+  - name: "200 OK Response"
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 0
+            body: {{ postPayload }}
+          expect:
+            - statusCode: 200

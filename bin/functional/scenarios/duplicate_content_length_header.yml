@@ -1,0 +1,14 @@
+scenarios:
+  - name: "Duplicate Content-Length Header With 1.0 Probability"
+    flow:
+      - post:
+          url: '/api/v1/mock'
+          json:
+            settings:
+              failureProbability: 1
+              simulators: 
+                header:
+                  duplicateHeader: Content-Length
+            body: {{ postPayload }}
+          expect:
+            - statusCode: 400

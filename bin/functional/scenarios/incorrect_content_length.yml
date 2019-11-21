@@ -1,0 +1,14 @@
+scenarios:
+  - name: "Incorrect Content Length with 1.0 Probability"
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 1
+              simulators: 
+                header:
+                  incorrectContentLength: true
+            body: {{ postPayload }}
+          expect:
+            - statusCode: 400

@@ -7,34 +7,40 @@ const { TestType, Mocktillery } = require("../dist/index");
 program
     .version("0.0.1")
     .option("-u, --url [url]", "URL to test")
-    .option("-t, --testsFolder [testFolder]", "Tests folder")
-    .option("-c, --compileFolder [compileFolder]", "Compile folder")
+    .option("-t, --testsFolder [tests folder]", "Tests folder")
+    .option("-c, --compileFolder [compile folder]", "Compile folder")
+    .option("-o, --output [output filename]", "Output filename (no extensions)")
     .option("-d, --debug", "Debug flag")
     .parse(process.argv);
 
 
 let debug = false;
 
-if(!program.url)
+if (!program.url)
     throw new Error("Must supply a valid url");
 
-if(!program.testsFolder)
+if (!program.testsFolder)
     throw new Error("Must supply a test folder");
 
-if(!program.compileFolder)
+if (!program.compileFolder)
     throw new Error("Must supply compile folder");
 
-if(program.debug)
+if (!program.output)
+    throw new Error("Must supply output filename");
+
+if (program.debug)
     debug = true;
 
 let url = program.url;
 let testsFolder = program.testsFolder;
 let compileFolder = program.compileFolder;
+let outputFilename = program.output;
 
-const config  = {
+const config = {
     type: TestType.Functional,
     testFolder: testsFolder,
     compileFolder: compileFolder,
+    outputFilename: outputFilename,
     debug: debug
 }
 
@@ -42,8 +48,4 @@ let mocktillery = new Mocktillery(config);
 
 mocktillery.loadTests();
 mocktillery.compile();
-mocktillery.run(url);
-
-
-
-
+mocktillery.run(url, true);

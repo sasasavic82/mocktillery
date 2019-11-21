@@ -7,6 +7,7 @@ export interface MocktilleryConfig {
     type: TestType,
     testFolder: string,
     compileFolder: string,
+    outputFilename: string,
     debug?: Boolean
 }
 

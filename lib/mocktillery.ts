@@ -18,11 +18,19 @@ export class Mocktillery {
 
     }
 
+    /**
+     * Public method for loading the tests. Depending on the type of tests you'd like to run
+     * the method will load up the config and test cases necessary to run them
+     */
     public loadTests(): void {
         if (this.config.type == TestType.Functional)
             this.loadFunctionalTests();
     }
 
+    /**
+     * Public method that compiles all of the individual test cases and load test configuration,
+     * into one file "config.yml" which artillery uses to load up and run it's tests
+     */
     public compile(): void {
 
         let yamlString = yml.safeDump(this.configObject);
@@ -32,15 +40,50 @@ export class Mocktillery {
         );
     }
 
-    public async run(url: string): Promise<void> {
+    /**
+     * Public run method that kicks off the load/functional tests
+     * @param url Service end point url
+     * @param withReport Once the load/functional tests are completed, we may want to output a report
+     */
+    public async run(url: string, withReport: Boolean = false): Promise<void> {
         try {
-            let ret: Std = await execAsync(`artillery run --target ${url} config.yml`);
+            await this.runInternal(url);
+            if(withReport) 
+                await this.runInternalReport();
+
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
+    /**
+     * 
+     * @param url 
+     */
+    private async runInternal(url: string): Promise<void> {
+
+        try {
+            let ret: Std = await execAsync(`artillery run --target ${url} config.yml --output ${this.config.outputFilename}.json --quiet &> ${this.config.outputFilename}.log`);
             console.log(ret.stdout);
             console.log(ret.stderr);
 
         } catch(e) {
             console.log(e);
-        }
+        }        
+    }
+
+    private async runInternalReport(): Promise<void> {
+        
+        try {
+            let ret: Std = await execAsync(`artillery report ${this.config.outputFilename}.json`, {
+                timeout: 10000
+            });
+            console.log(ret.stdout);
+            console.log(ret.stderr);
+
+        } catch(e) {
+            console.log(e);
+        }        
     }
 
     private loadFunctionalTests(): void {
