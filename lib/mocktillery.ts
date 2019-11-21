@@ -2,35 +2,17 @@
 import fs from "fs";
 import path from "path";
 import yml from "js-yaml";
-import { exec } from "child_process";
 import promisify from "util.promisify"
 
+import { exec } from "child_process";
+import { ConfigObject, TestType, MocktilleryConfig, Std } from "./types";
+
 const execAsync = promisify(exec);
-
-export enum TestType {
-    Load = "load",
-    Functional = "functional"
-}
-
-export interface MocktilleryConfig {
-    type: TestType,
-    testFolder: string,
-    compileFolder: string,
-    debug?: Boolean
-}
-
-export interface ConfigObject {
-    [key: string]: any
-}
-
-export interface Std {
-    stdout: string,
-    stderr: string
-}
 
 export class Mocktillery {
 
     private configObject: ConfigObject = {};
+    private currentWorkingDir: string = process.cwd();
 
     constructor(private config: MocktilleryConfig) {
 
@@ -46,13 +28,13 @@ export class Mocktillery {
         let yamlString = yml.safeDump(this.configObject);
 
         fs.writeFileSync(
-            path.join(__dirname, this.config.compileFolder, "config.yml"), yamlString
+            path.join(this.currentWorkingDir, this.config.compileFolder, "config.yml"), yamlString
         );
     }
 
     public async run(url: string): Promise<void> {
         try {
-            let ret: Std = await execAsync(`artillery run --target ${url} ./dist/lib/config.yml`);
+            let ret: Std = await execAsync(`artillery run --target ${url} config.yml`);
             console.log(ret.stdout);
             console.log(ret.stderr);
 
@@ -127,6 +109,6 @@ export class Mocktillery {
     }
 
     private getTestFolderPath(folderPath: string = ""): string {
-        return path.join(__dirname, this.config.testFolder, folderPath);
+        return path.join(this.currentWorkingDir, this.config.testFolder, folderPath);
     }
 }
