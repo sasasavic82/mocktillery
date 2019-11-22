@@ -48,4 +48,4 @@ let mocktillery = new Mocktillery(config);
 
 mocktillery.loadTests();
 mocktillery.compile();
-mocktillery.run(url, true);
+//mocktillery.run(url, true);
