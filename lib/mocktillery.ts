@@ -130,8 +130,10 @@ export class Mocktillery {
         });
 
         return scenarios.map((scenario) => {
-            if (scenario[0])
+            if (scenario[0]) {
+                console.log(`loaded: ${scenario[0].name}`);
                 return scenario[0];
+            }
         });
     }
 

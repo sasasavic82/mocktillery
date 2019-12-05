@@ -1,0 +1,303 @@
+config:
+  plugins:
+    expect: {}
+  variables:
+    payload:
+      name: Test
+      surname: McTestface
+      weight: 90
+      height: 185
+      addresses:
+        - name: Exhibition Street Office
+          address: '242 Exhibition Street, Melbourne CBD'
+      interests:
+        - software engineering
+  phases:
+    - duration: 20
+      arrivalRate: 10
+      name: Execute tests at 10 user per second for 5 minutes
+  defaults:
+    headers:
+      x-telstra-mocktillary-id: '{{ $uuid }}'
+scenarios:
+  - name: 200 OK On Getting Large 100MB File
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 1
+              simulators:
+                body:
+                  largeFilesize: '1'
+          capture:
+            json: $._link
+            as: link
+      - get:
+          url: '{{ link }}'
+          expect:
+            - statusCode: 200
+  - name: 200 OK On Getting 0.01MB (10kb) Payload
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 1
+              simulators:
+                body:
+                  largePayload: 0.01
+          expect:
+            - statusCode: 200
+  - name: 200 OK On Getting Large 10MB File
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 1
+              simulators:
+                body:
+                  largeFilesize: '1'
+          capture:
+            json: $._link
+            as: link
+      - get:
+          url: '{{ link }}'
+          expect:
+            - statusCode: 200
+  - name: 200 OK On Getting 0.001MB (1kb) Payload
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 1
+              simulators:
+                body:
+                  largePayload: 0.001
+          expect:
+            - statusCode: 200
+  - name: 200 OK On Getting Large 1MB Payload
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 1
+              simulators:
+                body:
+                  largePayload: 1
+          expect:
+            - statusCode: 200
+  - name: 200 OK On Getting 10MB Payload
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 1
+              simulators:
+                body:
+                  largePayload: 0.1
+          expect:
+            - statusCode: 200
+  - name: 200 OK Response
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 0
+            body:
+              '[object Object]': null
+          expect:
+            - statusCode: 200
+  - name: 200 OK Request Response Parity
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 0
+            body:
+              name: Test
+              surname: McTestface
+              weight: 90
+              height: 185
+          capture:
+            - json: $.name
+              as: name
+            - json: $.surname
+              as: surname
+            - json: $.weight
+              as: weight
+            - json: $.height
+              as: height
+          expect:
+            - statusCode: 200
+            - contentType: json
+            - equals:
+                - '{{ name }}'
+                - Test
+            - equals:
+                - '{{ surname }}'
+                - McTestface
+            - equals:
+                - '{{ weight }}'
+                - 90
+            - equals:
+                - '{{ height }}'
+                - 185
+  - name: 200 OK On Getting Large 200MB File
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 1
+              simulators:
+                body:
+                  largeFilesize: '2'
+          capture:
+            json: $._link
+            as: link
+      - get:
+          url: '{{ link }}'
+          expect:
+            - statusCode: 200
+  - name: 413 Payload Too Large On Getting 51MB Payload
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 1
+              simulators:
+                body:
+                  largePayload: 51
+          expect:
+            - statusCode: 413
+  - name: 422 Duplicate Host Header
+    flow:
+      - post:
+          url: /api/v1/mock
+          headers:
+            Host: test.host.com
+          json:
+            body: empty
+          expect:
+            - statusCode: 422
+  - name: 431 Request Header Fields Too large
+    flow:
+      - post:
+          url: /api/v1/mock
+          headers:
+            Large-Header: >-
+              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
+          json:
+            body: empty
+          expect:
+            - statusCode: 431
+  - name: 500 Gzip Not Compressed
+    flow:
+      - post:
+          url: /api/v1/mock
+          headers:
+            X-Mockingbird-Fake-Compression: gzip
+          json:
+            settings:
+              failureProbability: 1
+              simulators:
+                body:
+                  largePayload: 0.01
+                  fakeEncoding: true
+          expect:
+            - statusCode: 500
+  - name: 504 Gateway Timeout For Non-Responding Service
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 1
+              simulators:
+                delay:
+                  type: fixed
+                  delay: 120000
+            body:
+              '[object Object]': null
+          expect:
+            - statusCode: 504
+  - name: 200 OK On Getting Large 50MB File
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 1
+              simulators:
+                body:
+                  largeFilesize: '1'
+          capture:
+            json: $._link
+            as: link
+      - get:
+          url: '{{ link }}'
+          expect:
+            - statusCode: 200
+  - name: Abrupt Connection Reset with 1.0 Probability
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 1
+              simulators:
+                connection: connection_reset_by_peer
+            body:
+              '[object Object]': null
+          expect:
+            - statusCode: 500
+  - name: 406 Not Acceptable - Character Encoding Not UTF-8
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 1
+              simulators:
+                body:
+                  encodingScheme: utf-16
+            body:
+              '[object Object]': null
+          expect:
+            - statusCode: 406
+  - name: Duplicate Content-Length Header With 1.0 Probability
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 1
+              simulators:
+                header:
+                  duplicateHeader: Content-Length
+            body:
+              '[object Object]': null
+          expect:
+            - statusCode: 400
+  - name: Incorrect Content Length with 1.0 Probability
+    flow:
+      - post:
+          url: /api/v1/mock
+          json:
+            settings:
+              failureProbability: 1
+              simulators:
+                header:
+                  incorrectContentLength: true
+            body:
+              '[object Object]': null
+          expect:
+            - statusCode: 400
