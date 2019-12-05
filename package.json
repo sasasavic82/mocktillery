@@ -1,6 +1,6 @@
 {
   "name": "@imbueapp/mocktillery",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Mocktillery",
   "bin": {
     "mocktillery": "./bin/mocktillery"
