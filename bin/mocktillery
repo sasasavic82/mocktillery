@@ -4,48 +4,58 @@ const program = require('commander');
 
 const { TestType, Mocktillery } = require("../dist/index");
 
+let debug = false;
+
 program
-    .version("0.0.1")
-    .option("-u, --url [url]", "URL to test")
+    .command("compile")
     .option("-t, --testsFolder [tests folder]", "Tests folder")
     .option("-c, --compileFolder [compile folder]", "Compile folder")
     .option("-o, --output [output filename]", "Output filename (no extensions)")
     .option("-d, --debug", "Debug flag")
-    .parse(process.argv);
+    .action((cmdObj) => {
 
+        if (!cmdObj.testsFolder)
+            throw new Error("Must supply a test folder");
+        
+        if (!cmdObj.compileFolder)
+            throw new Error("Must supply compile folder");
+        
+        if (!cmdObj.output)
+            throw new Error("Must supply output filename");
+        
+        if (cmdObj.debug)
+            debug = true;
 
-let debug = false;
+        const config = {
+            type: TestType.Functional,
+            testFolder: cmdObj.testsFolder,
+            compileFolder: cmdObj.compileFolder,
+            outputFilename: cmdObj.output,
+            debug: debug
+        }
+        
+        let mocktillery = new Mocktillery(config);
+        
+        mocktillery.loadTests();
+        mocktillery.compile();
 
-if (!program.url)
-    throw new Error("Must supply a valid url");
+    });
 
-if (!program.testsFolder)
-    throw new Error("Must supply a test folder");
+program
+    .command("evaluate")
+    .option("-t, --testFile <file>", "mocktillery test output file")
+    .option("-d, --debug", "Debug flag")
+    .action((cmdObj) => {
 
-if (!program.compileFolder)
-    throw new Error("Must supply compile folder");
+        if (!cmdObj.testFile)
+            throw new Error("Must supply mocktillery test output file");
+        
+        if (cmdObj.debug)
+            debug = true;
+        
+        Mocktillery.evaluateTest(cmdObj.testFile);
 
-if (!program.output)
-    throw new Error("Must supply output filename");
+    });
+    
 
-if (program.debug)
-    debug = true;
-
-let url = program.url;
-let testsFolder = program.testsFolder;
-let compileFolder = program.compileFolder;
-let outputFilename = program.output;
-
-const config = {
-    type: TestType.Functional,
-    testFolder: testsFolder,
-    compileFolder: compileFolder,
-    outputFilename: outputFilename,
-    debug: debug
-}
-
-let mocktillery = new Mocktillery(config);
-
-mocktillery.loadTests();
-mocktillery.compile();
-//mocktillery.run(url, true);
+program.parse(process.argv);

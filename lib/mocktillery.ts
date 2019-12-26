@@ -5,7 +5,8 @@ import yml from "js-yaml";
 import promisify from "util.promisify"
 
 import { exec } from "child_process";
-import { ConfigObject, TestType, MocktilleryConfig, Std } from "./types";
+import { ConfigObject, TestType, MocktilleryConfig, Std, Output, TestResult } from "./types";
+import { formatWithOptions } from "util";
 
 const execAsync = promisify(exec);
 
@@ -16,6 +17,45 @@ export class Mocktillery {
 
     constructor(private config: MocktilleryConfig) {
 
+    }
+
+    public static evaluateTest(testFile: string): void {
+
+        let cwd: string = process.cwd();
+        let filePath: string = path.join(cwd, testFile);
+
+        if(!fs.existsSync(filePath))
+            throw new Error(`file ${filePath} does not exist`);
+
+        let testOutput: Output = require(filePath) as Output;
+
+        let results: TestResult | undefined = undefined;
+
+        if(!testOutput)
+            return;
+
+        if(testOutput.aggregate.scenariosCreated == testOutput.aggregate.scenariosCompleted) 
+            results = TestResult.Pass;
+        else
+            results = TestResult.Fail;
+
+        this.saveEvaluation(results);
+    }
+
+    public static saveEvaluation(testResult: TestResult | undefined): void {
+        /**
+         * Ignore saving results if undefined
+         */
+        if(!testResult)
+            return;
+
+        let cwd: string = process.cwd();
+        let outputFile: string = path.join(cwd, "latest.result");
+        try {
+            fs.writeFileSync(outputFile, testResult);
+        }catch(e) {
+            console.log(e);
+        }
     }
 
     /**
