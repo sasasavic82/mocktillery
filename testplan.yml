@@ -8,16 +8,9 @@ config:
       certificate: ./certificates/matls.mock.cert.client.crt
       key: ./certificates/matls.mock.cert.client.key
   phases:
-    - duration: 120
-      arrivalRate: 10
-      rampTo: 50
-      name: Ramp up virtual user arrival rate from 10 to 50 over 2 minutes
-    - duration: 120
-      arrivalRate: 50
-      name: Sustained max load for 2 minutes
-    - duration: 60
-      arrivalRate: 10
-      name: Ramp down to 10 virtual users per second for 1 minute
+    - duration: 300
+      arrivalRate: 20
+      name: Create 20 virtual users every second for 5 minutes
   defaults:
     headers:
       x-telstra-mocktillary-id: '{{ $uuid }}'
