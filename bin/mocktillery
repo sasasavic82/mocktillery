@@ -8,8 +8,8 @@ let debug = false;
 
 program
     .command("compile")
-    .option("-p, --profile", "Test profile")
-    .option("-f, --function", "Load or Functional")
+    .option("-p, --profile [profile type]", "Test profile")
+    .option("-f, --testFunction [function type]", "Load or Functional")
     .option("-t, --testsFolder [tests folder]", "Tests folder")
     .option("-c, --compileFolder [compile folder]", "Compile folder")
     .option("-o, --output [output filename]", "Output filename (no extensions)")
@@ -25,10 +25,10 @@ program
         if (!cmdObj.output)
             throw new Error("Must supply output filename");
 
-        if (!cmdObj.function)
+        if (!cmdObj.testFunction)
             throw new Error("Must supply test function type: load or functional");            
 
-        if(cmdObj.function == "load" && !cmdObj.profile) 
+        if(cmdObj.testFunction == "load" && !cmdObj.profile) 
             throw new Error("Must supply load profile: low, medium, high and full"); 
         
 
@@ -36,13 +36,15 @@ program
             debug = true;
 
         const config = {
-            type: cmdObj.function,
+            type: cmdObj.testFunction,
             testProfile: cmdObj.profile,
             testFolder: cmdObj.testsFolder,
             compileFolder: cmdObj.compileFolder,
             outputFilename: cmdObj.output,
             debug: debug
         }
+
+        console.log(config);
         
         let mocktillery = new Mocktillery(config);
         
