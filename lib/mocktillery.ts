@@ -65,6 +65,10 @@ export class Mocktillery {
     public loadTests(): void {
         if (this.config.type == TestType.Functional)
             this.loadFunctionalTests();
+
+        if (this.config.type == TestType.Load)
+            this.loadLoadTests();  
+        
     }
 
     /**
@@ -153,6 +157,29 @@ export class Mocktillery {
     }
 
     /**
+     * Load functional tests from the functional tests folder
+     * 
+     * This method will load the configuration file, as well as the individual
+     * test scenarios/cases.
+     */
+    private loadLoadTests(): void {
+
+        let testDir: string = this.getTestFolderPath();
+
+        if (this.config.debug)
+            console.log(testDir);
+
+        if (!fs.existsSync(testDir))
+            throw new Error(`${this.config.type} test folder doesn't exist`);
+
+        let profile: string = this.config.testProfile ?? "full";
+
+        this.configObject['config'] = this.loadConfig(profile);
+        this.configObject['scenarios'] = this.loadScenarios();
+
+    }
+
+    /**
      * Function that loads, parses and outputs the test scenarios/cases.
      */
     private loadScenarios(): any[] {
@@ -182,9 +209,14 @@ export class Mocktillery {
      * related to the length of the tests and the different load phases
      * that would run.
      */
-    private loadConfig(): ConfigObject {
+    private loadConfig(profile: string | undefined = undefined): ConfigObject {
 
-        let config: ConfigObject | undefined = this.loadYmlObject("config.yml");
+        let config: ConfigObject | undefined = undefined
+
+        if(!profile)
+            config = this.loadYmlObject("config.yml");
+        else
+            config = this.loadYmlObject(`${profile}.yml`, "profiles");
 
         if (!config)
             throw new Error("unable to load config.yml file contents");  
@@ -196,9 +228,14 @@ export class Mocktillery {
      * Helper method for loading yml files.
      * @param file yml filename
      */
-    private loadYmlObject(file: string): ConfigObject | undefined {
+    private loadYmlObject(file: string, profilePath: string | undefined = undefined): ConfigObject | undefined {
+        
+        let configPath: string = "";
 
-        let configPath = path.join(this.getTestFolderPath(), file);
+        if(!profilePath)
+            configPath = path.join(this.getTestFolderPath(), file);
+        else
+            configPath = path.join(this.getTestFolderPath(profilePath), file);
 
         if (!fs.existsSync(configPath))
             throw new Error(`${file} doesn't exist`);

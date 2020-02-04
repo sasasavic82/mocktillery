@@ -5,6 +5,7 @@ export enum TestType {
 
 export interface MocktilleryConfig {
     type: TestType,
+    testProfile?: string,
     testFolder: string,
     compileFolder: string,
     outputFilename: string,

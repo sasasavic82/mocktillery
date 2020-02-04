@@ -8,6 +8,8 @@ let debug = false;
 
 program
     .command("compile")
+    .option("-p, --profile", "Test profile")
+    .option("-f, --function", "Load or Functional")
     .option("-t, --testsFolder [tests folder]", "Tests folder")
     .option("-c, --compileFolder [compile folder]", "Compile folder")
     .option("-o, --output [output filename]", "Output filename (no extensions)")
@@ -22,12 +24,20 @@ program
         
         if (!cmdObj.output)
             throw new Error("Must supply output filename");
+
+        if (!cmdObj.function)
+            throw new Error("Must supply test function type: load or functional");            
+
+        if(cmdObj.function == "load" && !cmdObj.profile) 
+            throw new Error("Must supply load profile: low, medium, high and full"); 
         
+
         if (cmdObj.debug)
             debug = true;
 
         const config = {
-            type: TestType.Functional,
+            type: cmdObj.function,
+            testProfile: cmdObj.profile ?? undefined,
             testFolder: cmdObj.testsFolder,
             compileFolder: cmdObj.compileFolder,
             outputFilename: cmdObj.output,
