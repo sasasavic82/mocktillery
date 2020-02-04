@@ -37,7 +37,7 @@ program
 
         const config = {
             type: cmdObj.function,
-            testProfile: cmdObj.profile ?? undefined,
+            testProfile: cmdObj.profile,
             testFolder: cmdObj.testsFolder,
             compileFolder: cmdObj.compileFolder,
             outputFilename: cmdObj.output,
