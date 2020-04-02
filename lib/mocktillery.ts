@@ -19,7 +19,7 @@ export class Mocktillery {
 
     }
 
-    public static evaluateTest(testFile: string): void {
+    public static evaluateTest(testFile: string, resultsFile: string): void {
 
         let cwd: string = process.cwd();
         let filePath: string = path.join(cwd, testFile);
@@ -39,10 +39,10 @@ export class Mocktillery {
         else
             results = TestResult.Fail;
 
-        this.saveEvaluation(results);
+        this.saveEvaluation(results, resultsFile);
     }
 
-    public static saveEvaluation(testResult: TestResult | undefined): void {
+    public static saveEvaluation(testResult: TestResult | undefined, resultsFile: string): void {
         /**
          * Ignore saving results if undefined
          */
@@ -50,7 +50,7 @@ export class Mocktillery {
             return;
 
         let cwd: string = process.cwd();
-        let outputFile: string = path.join(cwd, "latest.result");
+        let outputFile: string = path.join(cwd, resultsFile);
         try {
             fs.writeFileSync(outputFile, testResult);
         }catch(e) {
@@ -73,7 +73,7 @@ export class Mocktillery {
 
     /**
      * Public method that compiles all of the individual test cases and load test configuration,
-     * into one file "config.yml" which artillery uses to load up and run it's tests
+     * into one file "config.yml" which artillery uses to load up and run its tests
      */
     public compile(): void {
 

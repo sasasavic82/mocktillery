@@ -55,17 +55,19 @@ program
 
 program
     .command("evaluate")
-    .option("-t, --testFile <file>", "mocktillery test output file")
+    .option("-t, --testFile [file]", "mocktillery test output file")
     .option("-d, --debug", "Debug flag")
     .action((cmdObj) => {
 
         if (!cmdObj.testFile)
             throw new Error("Must supply mocktillery test output file");
-        
+
+        let resultsFile = cmdObj.testFile.replace"(".json", ".result")
+
         if (cmdObj.debug)
             debug = true;
         
-        Mocktillery.evaluateTest(cmdObj.testFile);
+        Mocktillery.evaluateTest(cmdObj.testFile, resultsFile);
 
     });
     
